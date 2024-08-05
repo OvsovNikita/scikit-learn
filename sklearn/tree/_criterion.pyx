@@ -710,6 +710,7 @@ cdef class Gini(ClassificationCriterion):
         cdef float64_t count_k
         cdef intp_t k
         cdef intp_t c
+        cdef int w_c
 
         for k in range(self.n_outputs):
             sq_count = 0.0
@@ -745,6 +746,7 @@ cdef class Gini(ClassificationCriterion):
         cdef float64_t count_k
         cdef intp_t k
         cdef intp_t c
+        cdef int w_c
 
         for k in range(self.n_outputs):
             sq_count_left = 0.0
