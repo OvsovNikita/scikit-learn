@@ -715,10 +715,11 @@ cdef class Gini(ClassificationCriterion):
             sq_count = 0.0
 
             for c in range(self.n_classes[k]):
+                w_c = 2 if c == 1 else 1
                 count_k = self.sum_total[k, c]
-                sq_count += count_k * count_k
+                sq_count += w_c * count_k * (self.weighted_n_node_samples - count_k)
 
-            gini += 1.0 - sq_count / (self.weighted_n_node_samples *
+            gini += sq_count / (self.weighted_n_node_samples *
                                       self.weighted_n_node_samples)
 
         return gini / self.n_outputs
@@ -750,16 +751,17 @@ cdef class Gini(ClassificationCriterion):
             sq_count_right = 0.0
 
             for c in range(self.n_classes[k]):
+                w_c = 2 if c == 1 else 1
                 count_k = self.sum_left[k, c]
-                sq_count_left += count_k * count_k
+                sq_count_left += w_c * count_k * (self.weighted_n_left - count_k)
 
                 count_k = self.sum_right[k, c]
-                sq_count_right += count_k * count_k
+                sq_count_right += w_c * count_k * (self.weighted_n_right - count_k)
 
-            gini_left += 1.0 - sq_count_left / (self.weighted_n_left *
+            gini_left += sq_count_left / (self.weighted_n_left *
                                                 self.weighted_n_left)
 
-            gini_right += 1.0 - sq_count_right / (self.weighted_n_right *
+            gini_right += sq_count_right / (self.weighted_n_right *
                                                   self.weighted_n_right)
 
         impurity_left[0] = gini_left / self.n_outputs
