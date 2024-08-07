@@ -716,7 +716,7 @@ cdef class Gini(ClassificationCriterion):
             sq_count = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = 10 if c == 1 else 1
+                w_c = 10 if c == 1 else 0
                 count_k = self.sum_total[k, c]
                 sq_count += w_c * count_k * (self.weighted_n_node_samples - count_k)
 
@@ -753,7 +753,7 @@ cdef class Gini(ClassificationCriterion):
             sq_count_right = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = 10 if c == 1 else 1
+                w_c = 10 if c == 1 else 0
                 count_k = self.sum_left[k, c]
                 sq_count_left += w_c * count_k * (self.weighted_n_left - count_k)
 
