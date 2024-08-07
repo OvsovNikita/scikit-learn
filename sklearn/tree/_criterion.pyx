@@ -707,21 +707,21 @@ cdef class Gini(ClassificationCriterion):
         """
         cdef float64_t gini = 0.0
         cdef float64_t sq_count
-        cdef float64_t count_k
         cdef intp_t k
         cdef intp_t c
-        cdef int w_c
+        cdef float64_t w_1 = 0.7
+        cdef float64_t w_c
+        cdef float64_t p_c
 
         for k in range(self.n_outputs):
             sq_count = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = 10 if c == 1 else 1
-                count_k = self.sum_total[k, c]
-                sq_count += w_c * count_k * (self.weighted_n_node_samples - count_k)
+                w_c = w_1 if c == 1 else (1 - w_1)
+                p_c = self.sum_total[k, c] / self.weighted_n_node_samples
+                sq_count += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
 
-            gini += sq_count / (self.weighted_n_node_samples *
-                                      self.weighted_n_node_samples)
+            gini += sq_count
 
         return gini / self.n_outputs
 
@@ -743,28 +743,28 @@ cdef class Gini(ClassificationCriterion):
         cdef float64_t gini_right = 0.0
         cdef float64_t sq_count_left
         cdef float64_t sq_count_right
-        cdef float64_t count_k
         cdef intp_t k
         cdef intp_t c
-        cdef int w_c
+
+        cdef float64_t w_1 = 0.7
+        cdef float64_t w_c
+        cdef float64_t p_c
 
         for k in range(self.n_outputs):
             sq_count_left = 0.0
             sq_count_right = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = 10 if c == 1 else 1
-                count_k = self.sum_left[k, c]
-                sq_count_left += w_c * count_k * (self.weighted_n_left - count_k)
+                w_c = w_1 if c == 1 else (1 - w_1)
 
-                count_k = self.sum_right[k, c]
-                sq_count_right += w_c * count_k * (self.weighted_n_right - count_k)
+                p_c = self.sum_left[k, c] / self.weighted_n_left
+                sq_count_left += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
 
-            gini_left += sq_count_left / (self.weighted_n_left *
-                                                self.weighted_n_left)
+                p_c = self.sum_right[k, c] / self.weighted_n_right
+                sq_count_right += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
 
-            gini_right += sq_count_right / (self.weighted_n_right *
-                                                  self.weighted_n_right)
+            gini_left += sq_count_left
+            gini_right += sq_count_right
 
         impurity_left[0] = gini_left / self.n_outputs
         impurity_right[0] = gini_right / self.n_outputs
