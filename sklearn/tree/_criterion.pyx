@@ -746,7 +746,7 @@ cdef class Gini(ClassificationCriterion):
         cdef intp_t k
         cdef intp_t c
 
-        cdef float64_t w_1 = 0.7
+        cdef float64_t w_1 = 0.999
         cdef float64_t w_c
         cdef float64_t p_c
 
