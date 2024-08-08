@@ -709,7 +709,7 @@ cdef class Gini(ClassificationCriterion):
         cdef float64_t sq_count
         cdef intp_t k
         cdef intp_t c
-        cdef float64_t w_1 = 1.0
+        cdef float64_t w_1 = 0.7
         cdef float64_t w_c
         cdef float64_t p_c
 
@@ -717,10 +717,12 @@ cdef class Gini(ClassificationCriterion):
             sq_count = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = w_1 if c == 1 else (1 - w_1)
+                # w_c = w_1 if c == 1 else (1 - w_1)
+                # w_c = 1.0 if c == 1 else 0.0
                 p_c = self.sum_total[k, c] / self.weighted_n_node_samples
 
                 # sq_count += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
+                sq_count += p_c * w_c
 
             gini += sq_count
 
@@ -747,7 +749,7 @@ cdef class Gini(ClassificationCriterion):
         cdef intp_t k
         cdef intp_t c
 
-        cdef float64_t w_1 = 1.0
+        cdef float64_t w_1 = 0.7
         cdef float64_t w_c
         cdef float64_t p_c
 
@@ -756,13 +758,15 @@ cdef class Gini(ClassificationCriterion):
             sq_count_right = 0.0
 
             for c in range(self.n_classes[k]):
-                w_c = w_1 if c == 1 else (1 - w_1)
+                w_c = 1.0 if c == 1 else 0.0
 
                 p_c = self.sum_left[k, c] / self.weighted_n_left
                 # sq_count_left += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
+                sq_count_left += p_c * w_c
 
                 p_c = self.sum_right[k, c] / self.weighted_n_right
                 # sq_count_right += p_c * (1 - p_c) / (w_c * w_c + p_c * (1 - 2 * w_c))
+                sq_count_right += p_c * w_c
 
             gini_left += sq_count_left
             gini_right += sq_count_right
